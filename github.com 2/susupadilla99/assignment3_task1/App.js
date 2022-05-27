@@ -3,16 +3,18 @@ import {SafeAreaView, StyleSheet, View, Text, Picker, Image, Button} from 'react
 
 export default function App() {
 
-  const [picker1SelectedValue, setPicker1SelectedValue] = useState("val-Potato - $5");
-  const [picker2SelectedValue, setPicker2SelectedValue] = useState("val-Banana - $7");
+  const [picker1SelectedValue, setPicker1SelectedValue] = useState();
+  const [picker2SelectedValue, setPicker2SelectedValue] = useState();
 
   const [picker1image, setPicker1Image] = useState("https://img.icons8.com/ios/344/smiling.png");
   const [picker2image, setPicker2Image] = useState("https://img.icons8.com/ios/344/smiling.png");
 
-  const [quantity1SelectedValue, setQuantity1SelectedValue] = useState("0");
-  const [quantity2SelectedValue, setQuantity2SelectedValue] = useState("0");
+  const [quantity1SelectedValue, setQuantity1SelectedValue] = useState();
+  const [quantity2SelectedValue, setQuantity2SelectedValue] = useState();
 
-  const [calculatedValue,	setCalculatedValue]	=	useState("Press the button above to calculate total price.");
+  const [calculatedString, setCalculatedString] = useState("Press the button above to calculate total price.");
+  const [calculatedValue,	setCalculatedValue]	=	useState("");
+  const [stringColor, setStringColor] = useState("black");
 
   return (
 
@@ -23,8 +25,9 @@ export default function App() {
       </View>
       {/* 2. Image of your choice (Nishesh) */}
       <View style={styles.row2}>
-        <Image source={{uri:"https://cdn-icons-png.flaticon.com/512/3787/3787377.png"}}
-      style={styles.logo} />
+        <Image 
+          source={{uri:"https://cdn-icons-png.flaticon.com/512/3787/3787377.png"}}
+          style={styles.logo} />
       </View>
       {/* 3. Veggies dropdown (Annie) & 5. Quantity (Daniel)*/}
       <View style={styles.row3}>
@@ -41,10 +44,10 @@ export default function App() {
             else if (itemIndex == 2) setPicker1Image("https://cdn-icons-png.flaticon.com/512/2909/2909765.png");
             else if (itemIndex == 3) setPicker1Image("https://img.icons8.com/ios-filled/344/broccoli.png");
           }}>
-        <Picker.Item	label="Select a veggie" />
-      	<Picker.Item	label="Potato - $5"	value="val-Potato - $5"	/>
-        <Picker.Item	label="Capsicum - $8"	value="val-Capsicum - $8"	/>
-        <Picker.Item	label="Brocolli - $8"	value="val-Brocolli - $8"	/>
+          <Picker.Item	label="Select a veggie"/>
+      	  <Picker.Item	label="Potato - $5"	value="val-Potato - $5"	/>
+          <Picker.Item	label="Capsicum - $8"	value="val-Capsicum - $8"	/>
+          <Picker.Item	label="Brocolli - $8"	value="val-Brocolli - $8"	/>
         </Picker>
         <Picker 
           style={styles.quantityPicker}
@@ -91,27 +94,42 @@ export default function App() {
         </Picker>
       </View>
       {/* 6. Calculate button (Akif) */}
-      <View>
-      <Button title="Calculate"
-      onPress = {() => {
-        const lastCharVeggie = picker1SelectedValue[picker1SelectedValue.length - 1];
-        const charToIntPicker1 = parseInt(lastCharVeggie);
-        
-        const lastCharFruit = picker2SelectedValue[picker2SelectedValue.length - 1];
-        const charToIntPicker2 = parseInt(lastCharFruit);
+      <View style={styles.row6}>
+        <Button 
+          title="Calculate"
+          onPress = { () => {
+            var totalVeggiePrice = undefined;
+            var totalFruitPrice = undefined;
 
-        const veggieQuantity = quantity1SelectedValue;
+            if (picker1SelectedValue !== undefined && quantity1SelectedValue !== undefined) {
+            if (picker1SelectedValue !== null && quantity1SelectedValue !== null) {
+              const lastCharVeggie = picker1SelectedValue[picker1SelectedValue.length - 1];
+              const charToIntPicker1 = parseInt(lastCharVeggie);
+              const veggieQuantity = quantity1SelectedValue;
+              totalVeggiePrice = (charToIntPicker1 * veggieQuantity);
+            }
+            }
 
-        const fruitQuantity = quantity2SelectedValue;
+            if (picker2SelectedValue !== undefined && quantity2SelectedValue !== undefined) {
+            if (picker2SelectedValue !== null && quantity2SelectedValue !== null) {
+              const lastCharFruit = picker2SelectedValue[picker2SelectedValue.length - 1];
+              const charToIntPicker2 = parseInt(lastCharFruit);
+              const fruitQuantity = quantity2SelectedValue;
+              totalFruitPrice = (charToIntPicker2 * fruitQuantity);
+            }
+            } 
 
-        const totalVeggiePrice = (charToIntPicker1 * veggieQuantity);
-        const totalFruitPrice = (charToIntPicker2 * fruitQuantity);
-
-        setCalculatedValue(totalVeggiePrice + totalFruitPrice);
-      }}
-        />
-      <Text style={styles.calHeading}>Total cost of the order: ${calculatedValue} 
-      </Text>
+            if (totalVeggiePrice !== undefined && totalFruitPrice !== undefined) {
+              setCalculatedString("Total cost of the order: $");
+              setCalculatedValue(totalVeggiePrice + totalFruitPrice);
+              setStringColor("black");
+            } else {
+              setCalculatedString("Please select valid fruits, veggie & quantity from the dropdown above");
+              setCalculatedValue("");
+              setStringColor("red");
+            }
+          }}/>
+        <Text style={[styles.calHeading, {color: stringColor}]} >{calculatedString}{calculatedValue} </Text>
       </View>
 
       {/* 7. Developers credit  (Daniel) */}
@@ -131,7 +149,7 @@ const styles = StyleSheet.create({
     fontFamily: "Zapfino",
     fontSize: 25,
     textAlign: 'center',
-    marginTop: 50
+    marginTop: 20,
   },
   logo: {
     height: 100,
@@ -142,8 +160,11 @@ const styles = StyleSheet.create({
     height: 50, 
     alignSelf:'center'
   },
+  row1: {
+    flex: 0.5,
+  },
   row2: {
-    height: 150,
+    height: 100,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -154,6 +175,10 @@ const styles = StyleSheet.create({
   row4: {
     flex: 1,
     flexDirection: 'row',
+  },
+  row6: {
+    flex:0.7,
+    justifyContent: 'center',
   },
   row7: {
     flex: 0.2,
@@ -176,6 +201,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   calHeading: {
+    marginTop: 5,
     fontSize: 15,
     textAlign: 'center',
     fontFamily: 'Times New Roman',
